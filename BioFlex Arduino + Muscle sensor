@@ -1,0 +1,61 @@
+#include <Servo.h>
+
+const int MYOSENSOR_PIN = A0;
+const int SERVO_D4_PIN = 4;
+const int SERVO_D5_PIN = 5;
+const int SERVO_D9_PIN = 9;
+const int SERVO_D10_PIN = 10;
+const int SERVO_D11_PIN = 11;
+
+Servo servoD4;
+Servo servoD5;
+Servo servoD9;
+Servo servoD10;
+Servo servoD11;
+
+const int MYOSENSOR_THRESHOLD = 760;
+const int MYOSENSOR_MAX = 1023;
+int sweepDelay = 15;
+
+bool isSweeping = false;
+
+void setup() {
+  Serial.begin(9600);
+  pinMode(MYOSENSOR_PIN, INPUT);
+  servoD4.attach(SERVO_D4_PIN);
+  servoD5.attach(SERVO_D5_PIN);
+  servoD9.attach(SERVO_D9_PIN);
+  servoD10.attach(SERVO_D10_PIN);
+  servoD11.attach(SERVO_D11_PIN);
+}
+
+void loop() {
+  int myoSensorValue = analogRead(MYOSENSOR_PIN);
+  Serial.println(myoSensorValue);
+
+  if (myoSensorValue > MYOSENSOR_THRESHOLD) {
+    while (myoSensorValue < MYOSENSOR_MAX) {
+      int servoPosition = map(myoSensorValue, MYOSENSOR_THRESHOLD, MYOSENSOR_MAX, 0, 180);
+      servoD4.write(servoPosition);
+      servoD5.write(servoPosition);
+      servoD9.write(servoPosition);
+      servoD10.write(servoPosition);
+      servoD11.write(servoPosition);
+      delay(sweepDelay);
+      myoSensorValue = analogRead(MYOSENSOR_PIN);
+    }
+    servoD4.write(180);
+    servoD5.write(180);
+    servoD9.write(180);
+    servoD10.write(180);
+    servoD11.write(180);
+    delay(1000);
+  } else {
+    servoD4.write(0);
+    servoD5.write(0);
+    servoD9.write(0);
+    servoD10.write(0);
+    servoD11.write(0);
+  }
+  delay(100);
+}
